@@ -30,7 +30,7 @@ make
 make install
 ```
 Installing from binaries:
-``
+```
 wget astroberry-piface-*.deb
 dpkg -i astroberry-piface-*.deb
 ```
