@@ -15,7 +15,7 @@ The project provides INDI drivers using above addons:
 Astroberry PiFace is a successor of [Astroberry project](https://sourceforge.net/projects/astroberry/). Astroberry project was based on custom addon board, which required understanding of electronics and soldering skills to build. The new project was created to make things easier and let anybody use Raspberry Pi as a INDI server with support to all of these nice features of PiFace addon boards. Astroberry PiFace is based on hardware already available on market, so all you need is to put the tiles together, grab astroberry-piface software and you're ready to go.
 
 # How to start?
-First, you need to download and install INDI server and libraries. See http://indilib.org/download.html for more details.
+First, you need to download and install INDI server and libraries. See [INDI site](http://indilib.org/download.html) for more details.
 In most cases it's enough to run:
 ```
 sudo apt-add-repository ppa:mutlaqja/ppa
