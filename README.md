@@ -1,10 +1,15 @@
 # astroberry-piface
 Astroberry PiFace provides a set of INDI drivers for PiFace addon boards to Raspberry Pi:
-- PiFace Relay Plus (indi support for 4 relays 20V/1A with status LEDs),
-- PiFace Motor Extra (indi support for DC or stepper motors),
+- PiFace Relay Plus,
+- PiFace Motor Extra,
+- PiFace Control and Display.
+
+The project provides INDI drivers using above addons:
+- PiFace Relay (indi support for 4 relays 20V/1A with status LEDs, with Motor Extra supports 2 DC or stepper motors),
 - PiFace Control and Display (indi support for 2x16 LCD display + 5 buttons + nav button)
+- PiFace Focuser (indi focuser providing absolute and relative position control),
 - Astroberry GPS (indi support for gpsd service)
-- Astroberry AltIMU (indi support for AltIMU-10 v4 Gyro, Accelerometer, Compass, and Altimeter)
+- Astroberry AltIMU (indi support for AltIMU-10 v4 Gyro, Accelerometer, Compass, and Altimeter connected to I2C)
 
 # So what's the relation between Astroberry PiFace and Astroberry project?
 Astroberry PiFace is a successor of [Astroberry project](https://sourceforge.net/projects/astroberry/). Astroberry project was based on custom addon board, which required understanding of electronics and soldering skills to build. The new project was created to make things easier and let anybody use Raspberry Pi as a INDI server with support to all of these nice features of PiFace addon boards. Astroberry PiFace is based on hardware already available on market, so all you need is to put the tiles together, grab astroberry-piface software and you're ready to go.
