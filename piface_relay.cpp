@@ -122,7 +122,7 @@ bool IndiPiFaceRelay::Disconnect()
 {
 	// close device
 	close(mcp23s17_fd);
-	    
+
     IDMessage(getDeviceName(), "PiFace Relay disconnected successfully.");
     return true;
 }
@@ -146,8 +146,8 @@ void IndiPiFaceRelay::TimerHit()
 		// update system info
 		FILE* pipe;
 		char buffer[128];
-		
-		// every 3 secs
+
+		// every 5 seconds
 		if ( counter % 5 == 0 )
 		{
 			// reset system halt/restart button
@@ -223,7 +223,7 @@ void IndiPiFaceRelay::TimerHit()
 
 			NetInfoTP.s = IPS_OK;
 			IDSetText(&NetInfoTP, NULL);
-			
+
 			counter = 60;
 		}
 		counter--;
@@ -262,7 +262,6 @@ bool IndiPiFaceRelay::initProperties()
     IUFillSwitch(&SwitchS[1], "ALL_OFF", "All Off", ISS_OFF);
     IUFillSwitch(&SwitchS[2], "SW0HALT", "Shutdown", ISS_OFF);
     IUFillSwitch(&SwitchS[3], "SW0REBOOT", "Restart", ISS_OFF);
-
     IUFillSwitchVector(&SwitchSP, SwitchS, 4, getDeviceName(), "SWITCH_0", "System", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
 
     IUFillSwitch(&Relay1S[0], "REL1BTN", "On/Off", ISS_OFF);
