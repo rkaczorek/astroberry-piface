@@ -124,6 +124,9 @@ bool IndiRpigps::initProperties()
     IUFillNumber(&PolarisN[0],"HA","Polaris Hour Angle","%010.6m",0,24,0,0.0);
     IUFillNumberVector(&PolarisNP,PolarisN,1,getDeviceName(),"POLARIS","Polaris",MAIN_CONTROL_TAB,IP_RO,60,IPS_IDLE);
 
+	IUFillSwitch(&RefreshS[0], "REFRESH", "Update", ISS_OFF);
+	IUFillSwitchVector(&RefreshSP, RefreshS, 1, getDeviceName(), "GPS_REFRESH", "GPS", MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 0, IPS_IDLE);
+
     return true;
 }
 
@@ -221,7 +224,18 @@ IPState IndiRpigps::updateGPS()
 
 	// get utc offset
 	local_timeinfo = localtime (&rawtime);
-	snprintf(ts, sizeof(ts), "%4.2f", (local_timeinfo->tm_gmtoff/3600.0));
+	//snprintf(ts, sizeof(ts), "%4.2f", (local_timeinfo->tm_gmtoff/3600.0));
+	//IUSaveText(&TimeT[1], ts);
+
+	// get utc_offset
+	double offset = local_timeinfo->tm_gmtoff / 3600;
+
+	// adjust offset for DST
+	if (local_timeinfo->tm_isdst)
+		offset -= 1;
+	
+	// convert offset to string
+	sprintf(ts,"%0.0f", offset);
 	IUSaveText(&TimeT[1], ts);
 
 	// update gps location
