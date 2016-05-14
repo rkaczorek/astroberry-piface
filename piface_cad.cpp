@@ -530,10 +530,12 @@ int IndiPiFaceCAD::LCDPrint(char* text)
 	DispLineTP.s = IPS_BUSY;
 	IDSetText(&DispLineTP, NULL);
 	//pifacecad_lcd_clear();
+ 	pifacecad_lcd_set_cursor(0,0);
+	pifacecad_lcd_write("                \n                ");
 	pifacecad_lcd_set_cursor(0,0);
 
-    // write line
-    pifacecad_lcd_write(text);
+ 	// write line
+ 	pifacecad_lcd_write(text);
 
 	DispLineT[0].text = text;
 	DispLineTP.s = IPS_OK;
@@ -574,14 +576,12 @@ int IndiPiFaceCAD::UpdateInfo(int id)
 			int londeg = (int) LocationN[1].value;
 			int latmin = (int) ((LocationN[0].value - latdeg) * 60);
 			int lonmin = (int) ((LocationN[1].value - londeg) * 60);
-			double latsec = ((LocationN[0].value - latdeg - latmin/60) * 3600);
-			double lonsec = ((LocationN[1].value - londeg - lonmin/60) * 3600);
-			snprintf(latitude, 32, "%02d:%02d:%0.1f", latdeg, latmin, latsec);
-			snprintf(longitude, 32,"%02d:%02d:%0.1f", londeg, lonmin, lonsec);
-			// 52.166107 - 52° 9' 57.9852"
-			// 21.075572 - 21° 4' 32.0592"
-			//snprintf(latitude, 32, "%0.6f", LocationN[0].value);
-			//snprintf(longitude, 32, "%0.6f", LocationN[1].value);
+			int latsec = (int) ((LocationN[0].value - latdeg - latmin/60) * 3600);
+			int lonsec = (int) ((LocationN[1].value - londeg - lonmin/60) * 3600);
+			//latsec = (int) 12.345;
+			//lonsec = (int) 6.901;
+			snprintf(latitude, 32, "%02d:%02d:%02d", latdeg, latmin, latsec);
+			snprintf(longitude, 32,"%02d:%02d:%02d", londeg, lonmin, lonsec);
 			strcpy (dispinfo, "Lat : ");
 			strcat (dispinfo, latitude);
 			strcat (dispinfo, "\nLong: ");
