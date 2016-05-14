@@ -39,6 +39,9 @@ public:
 
 	INumber PolarisN[1];
 	INumberVectorProperty PolarisNP;
+	
+	ISwitch RefreshS[1];
+	ISwitchVectorProperty RefreshSP;
 
 	virtual const char *getDefaultName();
 
