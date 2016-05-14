@@ -25,8 +25,7 @@
 
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 
-#define MAX_STEPS 1000
-#define MOTOR_DIR 0
+#define MAX_STEPS 20000
 
 // We declare a pointer to indiPiFaceFocuser.
 // std::auto_ptr<PiFaceFocuser> PiFaceFocuser(0);
@@ -179,7 +178,7 @@ bool IndiPiFaceFocuser::initProperties()
 
 	// main tab
     IUFillSwitch(&FocusMotionS[0],"FOCUS_INWARD","Focus In",ISS_OFF);
-    IUFillSwitch(&FocusMotionS[1],"FOCUS_OUTWARD","Focus Out",ISS_ON);
+    IUFillSwitch(&FocusMotionS[1],"FOCUS_OUTWARD","Focus Out",ISS_OFF);
     IUFillSwitchVector(&FocusMotionSP,FocusMotionS,2,getDeviceName(),"FOCUS_MOTION","Direction",MAIN_CONTROL_TAB,IP_RW,ISR_ATMOST1,60,IPS_OK);
 
     IUFillNumber(&FocusRelPosN[0],"FOCUS_RELATIVE_POSITION","Steps","%0.0f",0,(int)MAX_STEPS/10,(int)MAX_STEPS/100,(int)MAX_STEPS/100);
@@ -209,7 +208,7 @@ bool IndiPiFaceFocuser::initProperties()
 	defineText(&PortTP);
 	defineSwitch(&MotorDirSP);
 	defineNumber(&MotorDelayNP);
-	defineNumber(&FocusBacklashNP);
+//	defineNumber(&FocusBacklashNP);
 
     return true;
 }
@@ -272,17 +271,6 @@ bool IndiPiFaceFocuser::ISNewNumber (const char *dev, const char *name, double v
         if (!strcmp(name, FocusRelPosNP.name))
         {
 			IUUpdateNumber(&FocusRelPosNP,values,names,n);
-
-			//FOCUS_INWARD
-            		if ( FocusMotionS[0].s == ISS_ON )
-			{
-				MoveRelFocuser(FOCUS_INWARD, FocusRelPosN[0].value);
-			}
-			//FOCUS_OUTWARD
-            		if ( FocusMotionS[1].s == ISS_ON )
-			{
-				MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
-			}
 			FocusRelPosNP.s=IPS_OK;
 			IDSetNumber(&FocusRelPosNP, NULL);
 			return true;
@@ -333,7 +321,7 @@ bool IndiPiFaceFocuser::ISNewSwitch (const char *dev, const char *name, ISState 
 	// first we check if it's for our device
     if (!strcmp(dev, getDeviceName()))
     {
-/*
+
         // handle focus motion in and out
         if (!strcmp(name, FocusMotionSP.name))
         {
@@ -347,14 +335,9 @@ bool IndiPiFaceFocuser::ISNewSwitch (const char *dev, const char *name, ISState 
             if ( FocusMotionS[1].s == ISS_ON )
 				MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
 
-            //FocusMotionS[0].s = ISS_OFF;
-            //FocusMotionS[1].s = ISS_OFF;
-
-			FocusMotionSP.s = IPS_OK;
-            IDSetSwitch(&FocusMotionSP, NULL);
             return true;
         }
-*/
+
         // handle focus presets
         if (!strcmp(name, PresetGotoSP.name))
         {
@@ -436,7 +419,7 @@ bool IndiPiFaceFocuser::ISNewSwitch (const char *dev, const char *name, ISState 
 			{
 				AbortSP.s = IPS_ALERT;
 			}
-			
+
 			IDSetSwitch(&AbortSP, NULL);
             return true;
         }
@@ -448,6 +431,17 @@ bool IndiPiFaceFocuser::ISNewSwitch (const char *dev, const char *name, ISState 
 bool IndiPiFaceFocuser::ISSnoopDevice (XMLEle *root)
 {
     //controller->ISSnoopDevice(root);
+    
+        // handle focus motion in and out
+
+		//FOCUS_INWARD
+		if ( FocusMotionS[0].s == ISS_ON )
+			MoveRelFocuser(FOCUS_INWARD, FocusRelPosN[0].value);
+
+		//FOCUS_OUTWARD
+		if ( FocusMotionS[1].s == ISS_ON )
+			MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
+			    
     return INDI::Focuser::ISSnoopDevice(root);
 }
 
@@ -480,6 +474,13 @@ IPState IndiPiFaceFocuser::MoveRelFocuser(FocusDirection direction, int ticks)
 
 IPState IndiPiFaceFocuser::MoveAbsFocuser(int targetTicks)
 {
+	// reset switches
+	FocusMotionS[0].s = ISS_OFF;
+	FocusMotionS[1].s = ISS_OFF;
+
+	FocusMotionSP.s = IPS_OK;
+	IDSetSwitch(&FocusMotionSP, NULL);
+
     if (targetTicks < FocusAbsPosN[0].min || targetTicks > FocusAbsPosN[0].max)
     {
         IDMessage(getDeviceName(), "Requested position is out of range.");
@@ -502,23 +503,16 @@ IPState IndiPiFaceFocuser::MoveAbsFocuser(int targetTicks)
     // set direction
     if (targetTicks > FocusAbsPosN[0].value)
     {
-	dir = FOCUS_OUTWARD;
-	FocusMotionS[0].s = ISS_OFF;
-	FocusMotionS[1].s = ISS_ON;
-	IDMessage(getDeviceName() , "PiFace Focuser is moving outward by %d", abs(targetTicks - FocusAbsPosN[0].value));
+		dir = FOCUS_OUTWARD;
+		IDMessage(getDeviceName() , "PiFace Focuser is moving outward by %d", abs(targetTicks - FocusAbsPosN[0].value));
     }
     else
     {
-	dir = FOCUS_INWARD;
-    FocusMotionS[0].s = ISS_ON;
-    FocusMotionS[1].s = ISS_OFF;
-	IDMessage(getDeviceName() , "PiFace Focuser is moving inward by %d", abs(targetTicks - FocusAbsPosN[0].value));
+		dir = FOCUS_INWARD;
+		IDMessage(getDeviceName() , "PiFace Focuser is moving inward by %d", abs(targetTicks - FocusAbsPosN[0].value));
     }
 
-     // set motion switch
-     IDSetSwitch(&FocusMotionSP, NULL);
-
-	// if direction changed do backlash adjustment
+	// if direction changed do backlash adjustment - TO DO
 	if ( lastdir != dir && FocusAbsPosN[0].value != 0 && FocusBacklashN[0].value != 0 )
 	{
 		IDMessage(getDeviceName() , "PiFace Focuser backlash compensation by %0.0f steps...", FocusBacklashN[0].value);
@@ -532,7 +526,7 @@ IPState IndiPiFaceFocuser::MoveAbsFocuser(int targetTicks)
 	StepperMotor(ticks, dir);
 
 	// update abspos value and status
-	IDSetNumber(&FocusAbsPosNP, "PiFace Focuser moved to position %0.0f", FocusAbsPosN[0].value);
+	IDSetNumber(&FocusAbsPosNP, "PiFace Focuser moved to position %0.0f", FocusAbsPosN[0].value );
 	FocusAbsPosNP.s = IPS_OK;
 	IDSetNumber(&FocusAbsPosNP, NULL);
 
@@ -541,33 +535,33 @@ IPState IndiPiFaceFocuser::MoveAbsFocuser(int targetTicks)
 
 int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
 {
-	int step_states[8];
+    int step_states[8];
     int value;
     int payload = 0x00;
 
 	if(direction == FOCUS_OUTWARD)
 	{
-		if ( MotorDirS[0].s == ISS_ON )
+		if ( MotorDirS[1].s == ISS_ON )
 		{
-			//forward reverse
+			//clockwise out
 			int step_states[8] = {0xa, 0x2, 0x6, 0x4, 0x5, 0x1, 0x9, 0x8};
 		}
 		else
 		{
-			// reverse reverse = forward
+			//clockwise in
 			int step_states[8] = {0x8, 0x9, 0x1, 0x5, 0x4, 0x6, 0x2, 0xa};
 		}
 	}
 	else
 	{
-		if ( MotorDirS[0].s == ISS_ON )
+		if ( MotorDirS[1].s == ISS_ON )
 		{
-			//forward reverse
+			//clockwise in
 			int step_states[8] = {0x8, 0x9, 0x1, 0x5, 0x4, 0x6, 0x2, 0xa};
 		}
 		else
 		{
-			// reverse reverse = forward
+			//clockwise out
 			int step_states[8] = {0xa, 0x2, 0x6, 0x4, 0x5, 0x1, 0x9, 0x8};
 		}
 	}
@@ -575,6 +569,7 @@ int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
     for (int i = 0; i < steps; i++)
     {
 		// update position for a client
+
         if ( dir == FOCUS_INWARD )
         	FocusAbsPosN[0].value -= 1;
         if ( dir == FOCUS_OUTWARD )
