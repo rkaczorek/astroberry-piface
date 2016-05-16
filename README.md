@@ -50,6 +50,6 @@ dpkg -i libmcp23s17_0.3.3-1_armhf.deb libpifacecad_0.2.0-1_armhf.deb astroberry-
 #How to use it?
 Start your INDI server with Astroberry PiFace drivers:
 
-`indiserver -l /var/log/indi -f /var/run/indi -p 7624 indi_piface_relay indi_piface_cad indi_piface_focuser indi_rpigps indi_rpialtimu`
+`indiserver -l /var/log/indi -f /var/run/indi -p 7624 indi_piface_relay indi_piface_cad indi_piface_focuser indi_rpialtimu`
 
 Start KStars with Ekos, connect to your INDI server and enjoy!
