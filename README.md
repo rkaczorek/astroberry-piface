@@ -42,8 +42,8 @@ NOTE: you need to have piface libraries installed on your system to compile and 
 ```
 wget https://github.com/rkaczorek/astroberry-piface/binaries/libmcp23s17_0.3.3-1_armhf.deb
 wget https://github.com/rkaczorek/astroberry-piface/binaries/libpifacecad_0.2.0-1_armhf.deb
-wget https://github.com/rkaczorek/astroberry-piface/binaries/astroberry-piface_1.0.0-1_armhf.deb
-dpkg -i libmcp23s17_0.3.3-1_armhf.deb libpifacecad_0.2.0-1_armhf.deb astroberry-piface_1.0.0-1_armhf.deb
+wget https://github.com/rkaczorek/astroberry-piface/binaries/astroberry-piface_1.0.1-1_armhf.deb
+dpkg -i libmcp23s17_0.3.3-1_armhf.deb libpifacecad_0.2.0-1_armhf.deb astroberry-piface_1.0.1-1_armhf.deb
 ```
 
 #How to use it?
