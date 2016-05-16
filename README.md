@@ -8,7 +8,6 @@ The project provides INDI drivers using above addons:
 - PiFace Relay (indi support for 4 relays 20V/1A with status LEDs, with Motor Extra supports 2 DC or stepper motors),
 - PiFace Control and Display (indi support for 2x16 LCD display + 5 buttons + nav button)
 - PiFace Focuser (indi focuser providing absolute and relative position control),
-- Astroberry AltIMU (indi support for AltIMU-10 v4 Gyro, Accelerometer, Compass, and Altimeter connected to I2C)
 
 # So what's the relation between Astroberry PiFace and Astroberry project?
 Astroberry PiFace is a successor of [Astroberry project](https://sourceforge.net/projects/astroberry/). Astroberry project was based on custom addon board, which required understanding of electronics and soldering skills to build. The new project was created to make things easier and let anybody use Raspberry Pi as a INDI server with support to all of these nice features of PiFace addon boards. Astroberry PiFace is based on hardware already available on market, so all you need is to put the tiles together, grab astroberry-piface software and you're ready to go.
@@ -50,6 +49,6 @@ dpkg -i libmcp23s17_0.3.3-1_armhf.deb libpifacecad_0.2.0-1_armhf.deb astroberry-
 #How to use it?
 Start your INDI server with Astroberry PiFace drivers:
 
-`indiserver -l /var/log/indi -f /var/run/indi -p 7624 indi_piface_relay indi_piface_cad indi_piface_focuser indi_rpialtimu`
+`indiserver -l /var/log/indi -f /var/run/indi -p 7624 indi_piface_relay indi_piface_cad indi_piface_focuser`
 
 Start KStars with Ekos, connect to your INDI server and enjoy!

@@ -50,14 +50,3 @@ target_link_libraries(indi_piface_cad indidriver pifacecad mcp23s17)
 install(TARGETS indi_piface_cad RUNTIME DESTINATION bin )
 install(FILES indi_piface_cad.xml DESTINATION ${INDI_DATA_DIR})
 
-################ Astroberry AltIMU ################
-
-set(indi_rpialtimu_SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/rpi_altimu.cpp
-   )
-
-add_executable(indi_rpialtimu ${indi_rpialtimu_SRCS})
-target_link_libraries(indi_rpialtimu indidriver RTIMULib)
-install(TARGETS indi_rpialtimu RUNTIME DESTINATION bin )
-install(FILES indi_rpialtimu.xml DESTINATION ${INDI_DATA_DIR})
-
