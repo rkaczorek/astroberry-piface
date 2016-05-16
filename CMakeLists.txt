@@ -61,14 +61,3 @@ target_link_libraries(indi_rpialtimu indidriver RTIMULib)
 install(TARGETS indi_rpialtimu RUNTIME DESTINATION bin )
 install(FILES indi_rpialtimu.xml DESTINATION ${INDI_DATA_DIR})
 
-################ Astroberry GPS ################
-
-set(indi_rpigps_SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/rpi_gps.cpp
-   )
-
-add_executable(indi_rpigps ${indi_rpigps_SRCS})
-target_link_libraries(indi_rpigps indidriver gps nova)
-install(TARGETS indi_rpigps RUNTIME DESTINATION bin )
-install(FILES indi_rpigps.xml DESTINATION ${INDI_DATA_DIR})
-
