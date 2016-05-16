@@ -8,7 +8,6 @@ The project provides INDI drivers using above addons:
 - PiFace Relay (indi support for 4 relays 20V/1A with status LEDs, with Motor Extra supports 2 DC or stepper motors),
 - PiFace Control and Display (indi support for 2x16 LCD display + 5 buttons + nav button)
 - PiFace Focuser (indi focuser providing absolute and relative position control),
-- Astroberry GPS (indi support for gpsd service)
 - Astroberry AltIMU (indi support for AltIMU-10 v4 Gyro, Accelerometer, Compass, and Altimeter connected to I2C)
 
 # So what's the relation between Astroberry PiFace and Astroberry project?
