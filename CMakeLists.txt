@@ -46,7 +46,7 @@ set(indi_piface_cad_SRCS
    )
 
 add_executable(indi_piface_cad ${indi_piface_cad_SRCS})
-target_link_libraries(indi_piface_cad indidriver pifacecad mcp23s17)
+target_link_libraries(indi_piface_cad indidriver ${CMAKE_CURRENT_SOURCE_DIR}/libpifacecad.a ${CMAKE_CURRENT_SOURCE_DIR}/libmcp23s17.a)
 install(TARGETS indi_piface_cad RUNTIME DESTINATION bin )
 install(FILES indi_piface_cad.xml DESTINATION ${INDI_DATA_DIR})
 

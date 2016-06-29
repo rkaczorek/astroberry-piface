@@ -1,7 +1,8 @@
+<driversList>
 <devGroup group="Auxiliary">
         <device label="PiFace CAD">
                 <driver name="PiFace CAD">indi_piface_cad</driver>
-                <version>1.0</version>
+                <version>1.0.1</version>
         </device>
 </devGroup>
-
+</driversList>

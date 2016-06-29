@@ -1,21 +1,7 @@
-Before compiling Astroberry PiFace:
-
-1) libmcp23s17
-# git clone https://github.com/piface/libmcp23s17.git
-# cd libmcp23s17
-# make
-# make install
-
-2) libpifacecad
-# git clone https://github.com/piface/libpifacecad.git
-# cd libpifacecad
-# make
-# make install
-
-3) libindi-dev
+1) Before compiling Astroberry PiFace install libindi-dev by running:
 # sudo apt-get install libindi-dev
 
-Compile Astroberry PiFace:
+2) Compile Astroberry PiFace:
 # git clone https://github.com/rkaczorek/astroberry-piface.git
 # cd astroberry-piface
 # mkdir build
