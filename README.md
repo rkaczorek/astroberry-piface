@@ -53,4 +53,4 @@ Start your INDI server with Astroberry PiFace drivers:
 
 Start KStars with Ekos, connect to your INDI server and enjoy!
 
-NOTE: PiFace Relay Plus address MUST be set to 000 for driver to work properly. You need to set JP1, JP2 and JP3 to 1-2 to set the address to 000 see PiFace Relay Plus [documentation](https://www.element14.com/community/servlet/JiveServlet/downloadBody/72070-102-2-303814/Getting%20Started%20-%20Relay.pdf) for details.
+NOTE: PiFace Relay Plus address MUST be set to 000 for driver to work properly. You need to set JP1, JP2 and JP3 to 1-2 to set the address to 000. See PiFace Relay Plus [documentation](https://www.element14.com/community/servlet/JiveServlet/downloadBody/72070-102-2-303814/Getting%20Started%20-%20Relay.pdf) for details.
