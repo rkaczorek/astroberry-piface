@@ -1,8 +1,7 @@
-<driversList>
 <devGroup group="Focusers">
         <device label="PiFace Focuser">
                 <driver name="PiFace Focuser">indi_piface_focuser</driver>
-                <version>1.0.1</version>
+                <version>1.0</version>
         </device>
 </devGroup>
-</driversList>
+
