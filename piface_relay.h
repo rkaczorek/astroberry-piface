@@ -48,6 +48,14 @@ private:
 	ISwitchVectorProperty Relay3SP;
 	ISwitch Relay4S[1];
 	ISwitchVectorProperty Relay4SP;
+	ISwitch Relay5S[1];
+	ISwitchVectorProperty Relay5SP;
+	ISwitch Relay6S[1];
+	ISwitchVectorProperty Relay6SP;
+	ISwitch Relay7S[1];
+	ISwitchVectorProperty Relay7SP;
+	ISwitch Relay8S[1];
+	ISwitchVectorProperty Relay8SP;
 public:
     IndiPiFaceRelay();
 	virtual ~IndiPiFaceRelay();
@@ -66,8 +74,8 @@ public:
 	virtual bool ISNewBLOB (const char *dev, const char *name, int sizes[], int blobsizes[], char *blobs[], char *formats[], char *names[], int n);
 	virtual bool ISSnoopDevice(XMLEle *root);
 	virtual bool saveConfigItems(FILE *fp);
-	virtual int Relays(int index);
-	virtual ISState RelayState(int index);
+	virtual int Relays(int chip, int index);
+	virtual ISState RelayState(int chip, int index);
 	virtual void LoadStates();
 	int mcp23s17_fd;
 };

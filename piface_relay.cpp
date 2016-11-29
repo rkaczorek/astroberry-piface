@@ -27,7 +27,6 @@
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 
 // We declare a pointer to IndiPiFaceRelay
-// std::auto_ptr<IndiPiFaceRelay> indiPiFaceRelay(0);
 std::unique_ptr<IndiPiFaceRelay> indiPiFaceRelay(new IndiPiFaceRelay);
 
 void ISPoll(void *p);
@@ -87,8 +86,8 @@ IndiPiFaceRelay::~IndiPiFaceRelay()
 }
 bool IndiPiFaceRelay::Connect()
 {
-	// open device
-    mcp23s17_fd = mcp23s17_open(0, 0);
+	// open device (bus, chip_select)
+    mcp23s17_fd = mcp23s17_open(0,0);
 
     if(mcp23s17_fd == -1)
 	{
@@ -96,23 +95,28 @@ bool IndiPiFaceRelay::Connect()
 		return false;
 	}
 
-    // config register
-    const uint8_t ioconfig = BANK_OFF | \
-                             INT_MIRROR_OFF | \
-                             SEQOP_OFF | \
-                             DISSLW_OFF | \
-                             HAEN_ON | \
-                             ODR_OFF | \
-                             INTPOL_LOW;
-    mcp23s17_write_reg(ioconfig, IOCON, 0, mcp23s17_fd);
+	// config register
+	const uint8_t ioconfig = BANK_OFF | \
+							 INT_MIRROR_OFF | \
+							 SEQOP_OFF | \
+							 DISSLW_OFF | \
+							 HAEN_ON | \
+							 ODR_OFF | \
+							 INTPOL_LOW;
+	mcp23s17_write_reg(ioconfig, IOCON, 0, mcp23s17_fd);
+	mcp23s17_write_reg(ioconfig, IOCON, 1, mcp23s17_fd);
 
-    // I/O direction
-    mcp23s17_write_reg(0x00, IODIRA, 0, mcp23s17_fd);
-    mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
+	// I/O direction
+	mcp23s17_write_reg(0x00, IODIRA, 0, mcp23s17_fd);
+	mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
+	mcp23s17_write_reg(0x00, IODIRA, 1, mcp23s17_fd);
+	mcp23s17_write_reg(0x00, IODIRB, 1, mcp23s17_fd);
 
-    // GPIOB pull ups
-    mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
+	// GPIOB pull ups
+	mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
+	mcp23s17_write_reg(0x00, GPPUB, 1, mcp23s17_fd);
 
+	// start timer for sysinfo updates
 	SetTimer(1000);
 
     IDMessage(getDeviceName(), "PiFace Relay connected successfully.");
@@ -186,8 +190,14 @@ void IndiPiFaceRelay::TimerHit()
 			pclose(pipe);
 			IUSaveText(&SysInfoT[3], buffer);
 
-			//update temperature
-			pipe = popen("vcgencmd measure_temp|awk -F= '{print $2}'", "r");
+			//update temperature - check banana pi
+			if (!strcmp(SysInfoT[0].text, "sun8i"))
+			{
+				pipe = popen("cat /sys/class/thermal/thermal_zone0/temp", "r");
+			} else
+			{
+				pipe = popen("vcgencmd measure_temp|awk -F= '{print $2}'", "r");
+			}
 			fgets(buffer, 128, pipe);
 			pclose(pipe);
 			IUSaveText(&SysInfoT[4], buffer);
@@ -276,6 +286,18 @@ bool IndiPiFaceRelay::initProperties()
     IUFillSwitch(&Relay4S[0], "REL4BTN", "On/Off", ISS_OFF);
     IUFillSwitchVector(&Relay4SP, Relay4S, 1, getDeviceName(), "RELAY4", "Relay 4", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
 
+    IUFillSwitch(&Relay5S[0], "REL5BTN", "On/Off", ISS_OFF);
+    IUFillSwitchVector(&Relay5SP, Relay5S, 1, getDeviceName(), "RELAY5", "Relay 5", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
+
+    IUFillSwitch(&Relay6S[0], "REL6BTN", "On/Off", ISS_OFF);
+    IUFillSwitchVector(&Relay6SP, Relay6S, 1, getDeviceName(), "RELAY6", "Relay 6", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
+
+    IUFillSwitch(&Relay7S[0], "REL7BTN", "On/Off", ISS_OFF);
+    IUFillSwitchVector(&Relay7SP, Relay7S, 1, getDeviceName(), "RELAY7", "Relay 7", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
+
+    IUFillSwitch(&Relay8S[0], "REL8BTN", "On/Off", ISS_OFF);
+    IUFillSwitchVector(&Relay8SP, Relay8S, 1, getDeviceName(), "RELAY8", "Relay 8", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
+
 	// options
     IUFillText(&PortT[0], "PORT", "Port","PiFace Relay+");
     IUFillTextVector(&PortTP,PortT,1,getDeviceName(),"DEVICE_PORT","Ports",OPTIONS_TAB,IP_RO,0,IPS_OK);
@@ -299,7 +321,10 @@ bool IndiPiFaceRelay::updateProperties()
 		defineSwitch(&Relay2SP);
 		defineSwitch(&Relay3SP);
 		defineSwitch(&Relay4SP);
-
+		defineSwitch(&Relay5SP);
+		defineSwitch(&Relay6SP);
+		defineSwitch(&Relay7SP);
+		defineSwitch(&Relay8SP);
 		LoadStates();
     }
     else
@@ -313,6 +338,10 @@ bool IndiPiFaceRelay::updateProperties()
 		deleteProperty(Relay2SP.name);
 		deleteProperty(Relay3SP.name);
 		deleteProperty(Relay4SP.name);
+		deleteProperty(Relay5SP.name);
+		deleteProperty(Relay6SP.name);
+		deleteProperty(Relay7SP.name);
+		deleteProperty(Relay8SP.name);
     }
     return true;
 }
@@ -377,7 +406,8 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 			{
 				SwitchSP.s = IPS_IDLE;
 				IDSetSwitch(&SwitchSP, NULL);
-				Relays(5);
+				Relays(0,5);
+				Relays(1,5);
 				LoadStates();
 				IDMessage(getDeviceName(), "All relays set ON");
 				return true;
@@ -387,7 +417,8 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 			{
 				SwitchSP.s = IPS_IDLE;
 				IDSetSwitch(&SwitchSP, NULL);
-				Relays(0);
+				Relays(0,0);
+				Relays(1,0);
 				LoadStates();
 				IDMessage(getDeviceName(), "All relays set OFF");
 				return true;
@@ -420,15 +451,21 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 
 			if ( Relay1S[0].s)
 			{
-				// click	
-				Relay1SP.s = IPS_OK;
+				// click
+				Relay1SP.s = IPS_BUSY;
 				IDSetSwitch(&Relay1SP, NULL);
-				Relays(1);
-				Relay1S[0].s = RelayState(1) ? RelayState(1) : ISS_OFF;
-				IDMessage(getDeviceName(), "PiFace Relay Relay 1: %s", Relay1S[0].s == ISS_ON ? "ON" : "OFF" );
-				Relay1SP.s = IPS_IDLE;
-				if(Relay1S[0].s == ISS_ON)
-					Relay1SP.s = IPS_OK;
+				if (Relays(0,1) != 0)
+				{
+					Relay1SP.s = IPS_IDLE;
+                                        Relay1S[0].s = ISS_OFF;
+				} else
+				{
+					Relay1S[0].s = RelayState(0,1) ? RelayState(0,1) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 1: %s", Relay1S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay1SP.s = IPS_IDLE;
+					if(Relay1S[0].s == ISS_ON)
+						Relay1SP.s = IPS_OK;
+				}
 				IDSetSwitch(&Relay1SP, NULL);
 				return true;
 			}
@@ -439,15 +476,21 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 
 			if ( Relay2S[0].s)
 			{
-				// click	
-				Relay1SP.s = IPS_OK;
+				// click
+				Relay2SP.s = IPS_BUSY;
 				IDSetSwitch(&Relay2SP, NULL);
-				Relays(2);
-				Relay2S[0].s = RelayState(2) ? RelayState(2) : ISS_OFF;
-				IDMessage(getDeviceName(), "PiFace Relay Relay 2: %s", Relay2S[0].s == ISS_ON ? "ON" : "OFF" );
-				Relay2SP.s = IPS_IDLE;
-				if(Relay2S[0].s == ISS_ON)
-					Relay2SP.s = IPS_OK;
+                                if (Relays(0,2) != 0)
+                                {
+                                        Relay2SP.s = IPS_IDLE;
+                                        Relay2S[0].s = ISS_OFF;
+                                } else
+				{
+					Relay2S[0].s = RelayState(0,2) ? RelayState(0,2) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 2: %s", Relay2S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay2SP.s = IPS_IDLE;
+					if(Relay2S[0].s == ISS_ON)
+						Relay2SP.s = IPS_OK;
+				}
 				IDSetSwitch(&Relay2SP, NULL);
 				return true;
 			}
@@ -458,15 +501,22 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 
 			if ( Relay3S[0].s)
 			{
-				// click	
-				Relay1SP.s = IPS_OK;
+				// click
+				Relay3SP.s = IPS_BUSY;
 				IDSetSwitch(&Relay3SP, NULL);
-				Relays(3);
-				Relay3S[0].s = RelayState(3) ? RelayState(3) : ISS_OFF;
-				IDMessage(getDeviceName(), "PiFace Relay Relay 3: %s", Relay3S[0].s == ISS_ON ? "ON" : "OFF" );
-				Relay3SP.s = IPS_IDLE;
-				if(Relay3S[0].s == ISS_ON)
-					Relay3SP.s = IPS_OK;
+                                if (Relays(0,3) != 0)
+                                {
+                                        Relay3SP.s = IPS_IDLE;
+                                        Relay3S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay3SP, NULL);
+                                } else
+				{
+					Relay3S[0].s = RelayState(0,3) ? RelayState(0,3) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 3: %s", Relay3S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay3SP.s = IPS_IDLE;
+					if(Relay3S[0].s == ISS_ON)
+						Relay3SP.s = IPS_OK;
+				}
 				IDSetSwitch(&Relay3SP, NULL);
 				return true;
 			}
@@ -478,15 +528,126 @@ bool IndiPiFaceRelay::ISNewSwitch (const char *dev, const char *name, ISState *s
 			if ( Relay4S[0].s)
 			{
 				// click
-				Relay1SP.s = IPS_OK;
+				Relay4SP.s = IPS_BUSY;
 				IDSetSwitch(&Relay4SP, NULL);
-				Relays(4);
-				Relay4S[0].s = RelayState(4) ? RelayState(4) : ISS_OFF;
-				IDMessage(getDeviceName(), "PiFace Relay Relay 4: %s", Relay4S[0].s == ISS_ON ? "ON" : "OFF" );
-				Relay4SP.s = IPS_IDLE;
-				if(Relay4S[0].s == ISS_ON)
-					Relay4SP.s = IPS_OK;
+                                if (Relays(0,4) != 0)
+                                {
+                                        Relay4SP.s = IPS_IDLE;
+                                        Relay4S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay4SP, NULL);
+                                } else
+				{
+					Relay4S[0].s = RelayState(0,4) ? RelayState(0,4) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 4: %s", Relay4S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay4SP.s = IPS_IDLE;
+					if(Relay4S[0].s == ISS_ON)
+						Relay4SP.s = IPS_OK;
+				}
 				IDSetSwitch(&Relay4SP, NULL);
+				return true;
+			}
+		}
+		if (!strcmp(name, Relay5SP.name))
+		{
+			IUUpdateSwitch(&Relay5SP, states, names, n);
+
+			if ( Relay5S[0].s)
+			{
+				// click
+				Relay5SP.s = IPS_BUSY;
+				IDSetSwitch(&Relay5SP, NULL);
+                                if (Relays(1,1) != 0)
+                                {
+                                        Relay5SP.s = IPS_IDLE;
+                                        Relay5S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay5SP, NULL);
+                                } else
+				{
+					Relay5S[0].s = RelayState(1,1) ? RelayState(1,1) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 5: %s", Relay5S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay5SP.s = IPS_IDLE;
+					if(Relay5S[0].s == ISS_ON)
+						Relay5SP.s = IPS_OK;
+				}
+				IDSetSwitch(&Relay5SP, NULL);
+				return true;
+			}
+		}
+		if (!strcmp(name, Relay6SP.name))
+		{
+			IUUpdateSwitch(&Relay6SP, states, names, n);
+
+			if ( Relay6S[0].s)
+			{
+				// click
+				Relay6SP.s = IPS_BUSY;
+				IDSetSwitch(&Relay6SP, NULL);
+                                if (Relays(1,2) != 0)
+                                {
+                                        Relay6SP.s = IPS_IDLE;
+                                        Relay6S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay6SP, NULL);
+                                } else
+				{
+					Relay6S[0].s = RelayState(1,2) ? RelayState(1,2) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 6: %s", Relay6S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay6SP.s = IPS_IDLE;
+					if(Relay6S[0].s == ISS_ON)
+						Relay6SP.s = IPS_OK;
+				}
+				IDSetSwitch(&Relay6SP, NULL);
+				return true;
+			}
+		}
+		if (!strcmp(name, Relay7SP.name))
+		{
+			IUUpdateSwitch(&Relay7SP, states, names, n);
+
+			if ( Relay7S[0].s)
+			{
+				// click
+				Relay7SP.s = IPS_BUSY;
+				IDSetSwitch(&Relay7SP, NULL);
+                                if (Relays(1,3) != 0)
+                                {
+                                        Relay7SP.s = IPS_IDLE;
+                                        Relay7S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay7SP, NULL);
+                                } else
+				{
+					Relay7S[0].s = RelayState(1,3) ? RelayState(1,3) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 7: %s", Relay7S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay7SP.s = IPS_IDLE;
+					if(Relay7S[0].s == ISS_ON)
+						Relay7SP.s = IPS_OK;
+				}
+				IDSetSwitch(&Relay7SP, NULL);
+				return true;
+			}
+		}
+		if (!strcmp(name, Relay8SP.name))
+		{
+			IUUpdateSwitch(&Relay8SP, states, names, n);
+
+			if ( Relay8S[0].s)
+			{
+				// click
+				Relay8SP.s = IPS_BUSY;
+				IDSetSwitch(&Relay8SP, NULL);
+                                if (Relays(1,4) != 0)
+                                {
+                                        Relay8SP.s = IPS_IDLE;
+                                        Relay8S[0].s = ISS_OFF;
+                                        IDSetSwitch(&Relay8SP, NULL);
+                                } else
+				{
+					Relay8S[0].s = RelayState(1,4) ? RelayState(1,4) : ISS_OFF;
+					IDMessage(getDeviceName(), "PiFace Relay Relay 8: %s", Relay8S[0].s == ISS_ON ? "ON" : "OFF" );
+					Relay8SP.s = IPS_IDLE;
+					if(Relay8S[0].s == ISS_ON)
+						Relay8SP.s = IPS_OK;
+				}
+				IDSetSwitch(&Relay8SP, NULL);
 				return true;
 			}
 		}
@@ -511,25 +672,30 @@ bool IndiPiFaceRelay::saveConfigItems(FILE *fp)
 	IUSaveConfigSwitch(fp, &Relay2SP);
 	IUSaveConfigSwitch(fp, &Relay3SP);
 	IUSaveConfigSwitch(fp, &Relay4SP);
+	IUSaveConfigSwitch(fp, &Relay5SP);
+	IUSaveConfigSwitch(fp, &Relay6SP);
+	IUSaveConfigSwitch(fp, &Relay7SP);
+	IUSaveConfigSwitch(fp, &Relay8SP);
 
     return true;
 }
-int IndiPiFaceRelay::Relays(int index)
+int IndiPiFaceRelay::Relays(int chip, int index)
 {
-    if (index < 0 || index > 5)
+    if (chip < 0 || chip > 1 || index < 0 || index > 5)
        return 1;
 
     int value;
+    uint8_t payload_in, payload_out;
 
     //read states
-    uint8_t payload = mcp23s17_read_reg(GPIOA, 0, mcp23s17_fd);
+	payload_in = mcp23s17_read_reg(GPIOA, chip, mcp23s17_fd);
 
-    switch(index)
-    {
+	switch(index)
+	{
 	case 0:
 	  value = 0x00;
 	  break;
-    case 1:
+	case 1:
 	  value = 0x01;
 	  break;
 	case 2:
@@ -546,26 +712,40 @@ int IndiPiFaceRelay::Relays(int index)
 	  break;
 	default:
 	  value = 0x00;
-    }
+	}
 
-    // Handle all on and off
-    if( value == 0x00 || value == 0xff )
-    {
-      payload = value;
-    } else
-    {
-      payload = value ^ payload;
-    }
+	// Handle all on and off
+	if( value == 0x00 || value == 0xff )
+	{
+	  payload_out = value;
+	} else
+	{
+	  payload_out = value ^ payload_in;
+	}
 
-    // Write to GPIO Port A
-    mcp23s17_write_reg(payload, GPIOA, 0, mcp23s17_fd);
+        // Write to GPIO Port A
+        mcp23s17_write_reg(payload_out, GPIOA, chip, mcp23s17_fd);
+
+	// Check if successfuly written to port
+	payload_in = mcp23s17_read_reg(GPIOA, chip, mcp23s17_fd);
+
+	if (payload_in == payload_out)
+	{
+		return 0;
+	} else
+	{
+		return 1;
+	}
 }
-ISState IndiPiFaceRelay::RelayState(int index)
+ISState IndiPiFaceRelay::RelayState(int chip, int index)
 {
+    if (chip < 0 || chip > 1 || index < 0 || index > 5)
+       return ISS_OFF;
+
 	ISState state;
 
-    //read states
-    uint8_t relays = mcp23s17_read_reg(GPIOA, 0, mcp23s17_fd);
+	// read states
+	uint8_t relays = mcp23s17_read_reg(GPIOA, chip, mcp23s17_fd);
 
 	if(CHECK_BIT(relays,index-1) == 1)
 	{
@@ -580,27 +760,51 @@ ISState IndiPiFaceRelay::RelayState(int index)
 void IndiPiFaceRelay::LoadStates()
 {
 	// load states
-	Relay1S[0].s = RelayState(1);
+	Relay1S[0].s = RelayState(0,1);
 	Relay1SP.s = IPS_IDLE;
 	if(Relay1S[0].s == ISS_ON)
 		Relay1SP.s = IPS_OK;
 	IDSetSwitch(&Relay1SP, NULL);
-	
-	Relay2S[0].s = RelayState(2);
+
+	Relay2S[0].s = RelayState(0,2);
 	Relay2SP.s = IPS_IDLE;
 	if(Relay2S[0].s == ISS_ON)
 		Relay2SP.s = IPS_OK;
 	IDSetSwitch(&Relay2SP, NULL);
-	
-	Relay3S[0].s = RelayState(3);
+
+	Relay3S[0].s = RelayState(0,3);
 	Relay3SP.s = IPS_IDLE;
 	if(Relay3S[0].s == ISS_ON)
 		Relay3SP.s = IPS_OK;
 	IDSetSwitch(&Relay3SP, NULL);
-	
-	Relay4S[0].s = RelayState(4);
+
+	Relay4S[0].s = RelayState(0,4);
 	Relay4SP.s = IPS_IDLE;
 	if(Relay4S[0].s == ISS_ON)
 		Relay4SP.s = IPS_OK;
 	IDSetSwitch(&Relay4SP, NULL);
+
+	Relay5S[0].s = RelayState(1,1);
+	Relay5SP.s = IPS_IDLE;
+	if(Relay5S[0].s == ISS_ON)
+		Relay5SP.s = IPS_OK;
+	IDSetSwitch(&Relay5SP, NULL);
+
+	Relay6S[0].s = RelayState(1,2);
+	Relay6SP.s = IPS_IDLE;
+	if(Relay6S[0].s == ISS_ON)
+		Relay6SP.s = IPS_OK;
+	IDSetSwitch(&Relay6SP, NULL);
+
+	Relay7S[0].s = RelayState(1,3);
+	Relay7SP.s = IPS_IDLE;
+	if(Relay7S[0].s == ISS_ON)
+		Relay7SP.s = IPS_OK;
+	IDSetSwitch(&Relay7SP, NULL);
+
+	Relay8S[0].s = RelayState(1,4);
+	Relay8SP.s = IPS_IDLE;
+	if(Relay8S[0].s == ISS_ON)
+		Relay8SP.s = IPS_OK;
+	IDSetSwitch(&Relay8SP, NULL);
 }
