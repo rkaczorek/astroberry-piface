@@ -40,7 +40,7 @@ wget astroberry-piface-*.deb
 dpkg -i astroberry-piface-*.deb
 ```
 
-NOTE: you need to have piface libraries installed on your system to compile and run astroberry piface drivers. Read INSTALL file for details and/or download and install binary packages from "binaries" directory:
+NOTE: you need to have [libmcp23s17](https://github.com/piface/libmcp23s17) and [libpifacecad](https://github.com/piface/libpifacecad) libraries installed on your system to compile and run Astroberry PiFace drivers. Read INSTALL file for details and/or download and install binary packages from "binaries" directory:
 ```
 wget https://github.com/rkaczorek/astroberry-piface/binaries/libmcp23s17_0.3.3-1_armhf.deb
 wget https://github.com/rkaczorek/astroberry-piface/binaries/libpifacecad_0.2.0-1_armhf.deb
