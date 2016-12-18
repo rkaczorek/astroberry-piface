@@ -1,6 +1,0 @@
-[submodule "deps/libmcp23s17"]
-	path = deps/libmcp23s17
-	url = https://github.com/piface/libmcp23s17.git
-[submodule "deps/libpifacecad"]
-	path = deps/libpifacecad
-	url = https://github.com/piface/libpifacecad
