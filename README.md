@@ -37,7 +37,7 @@ make install
 ```
 Installing from binaries:
 ```
-wget astroberry-piface-latest.deb
+wget https://github.com/rkaczorek/astroberry-piface/raw/master/binaries/astroberry-piface-latest.deb
 dpkg -i astroberry-piface-latest.deb
 ```
 
