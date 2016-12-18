@@ -9,7 +9,7 @@ The project provides INDI drivers using above addons:
 
 # Major changes
 - Starting from version 2.0.1 the driver supports up to 8 relays (requires 2 PiFace Relay Plus addon modules) and 2 stepper focusers.
-- From version 2.0.2 PiFace Control and Display driver (indi_piface_cad) was moved to separate project.
+- From version 2.0.2 PiFace Control and Display driver (indi_piface_cad) was moved to [separate project](https://github.com/rkaczorek/astroberry-piface-cad).
 
 # So what's the relation between Astroberry PiFace and Astroberry project?
 Astroberry PiFace is a successor of [Astroberry project](https://sourceforge.net/projects/astroberry/). Astroberry project was based on custom addon board, which required understanding of electronics and soldering skills to build. The new project was created to make things easier and let anybody use Raspberry Pi as a INDI server with support to all of these nice features of PiFace addon boards. Astroberry PiFace is based on hardware already available on market, so all you need is to put the tiles together, grab astroberry-piface software and you're ready to go.
