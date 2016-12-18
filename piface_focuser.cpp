@@ -23,6 +23,8 @@
 
 #include "piface_focuser.h"
 
+#define MAJOR_VERSION 2
+#define MINOR_VERSION 0
 
 #define FOCUSNAMEF1 "PiFace Focuser 1"
 #define FOCUSNAMEF2 "PiFace Focuser 2"
@@ -91,7 +93,7 @@ void ISSnoopDevice (XMLEle *root)
 
 IndiPiFaceFocuser1::IndiPiFaceFocuser1()
 {
-	setVersion(1,0);
+	setVersion(MAJOR_VERSION,MINOR_VERSION);
 }
 
 IndiPiFaceFocuser1::~IndiPiFaceFocuser1()

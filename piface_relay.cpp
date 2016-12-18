@@ -24,6 +24,9 @@
 
 #include "piface_relay.h"
 
+#define MAJOR_VERSION 2
+#define MINOR_VERSION 0
+
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 
 // We declare a pointer to IndiPiFaceRelay
@@ -79,7 +82,7 @@ void ISSnoopDevice (XMLEle *root)
 }
 IndiPiFaceRelay::IndiPiFaceRelay()
 {
-	setVersion(1,0);
+	setVersion(MAJOR_VERSION,MINOR_VERSION);
 }
 IndiPiFaceRelay::~IndiPiFaceRelay()
 {

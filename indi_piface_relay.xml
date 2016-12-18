@@ -1,7 +1,7 @@
 <devGroup group="Auxiliary">
         <device label="PiFace Relay">
                 <driver name="PiFace Relay">indi_piface_relay</driver>
-                <version>2.0.1</version>
+                <version>2.0.2</version>
         </device>
 </devGroup>
 
