@@ -24,7 +24,7 @@
 #include "piface_focuser.h"
 
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 0
+#define MINOR_VERSION 1
 
 #define FOCUSNAMEF1 "PiFace Focuser 1"
 #define FOCUSNAMEF2 "PiFace Focuser 2"
@@ -94,6 +94,7 @@ void ISSnoopDevice (XMLEle *root)
 IndiPiFaceFocuser1::IndiPiFaceFocuser1()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
+        setFocuserConnection(0);
 }
 
 IndiPiFaceFocuser1::~IndiPiFaceFocuser1()
@@ -158,9 +159,6 @@ bool IndiPiFaceFocuser1::initProperties()
     INDI::Focuser::initProperties();
 
 	// options tab
-	IUFillText(&PortT[0], "PORT", "Port","PiFace Relay+");
-	IUFillTextVector(&PortTP,PortT,1,getDeviceName(),"DEVICE_PORT","Ports",OPTIONS_TAB,IP_RO,0,IPS_OK);
-
 	IUFillNumber(&MotorDelayN[0],"MOTOR_DELAY","milliseconds","%0.0f",1,100,1,2);
 	IUFillNumberVector(&MotorDelayNP,MotorDelayN,1,getDeviceName(),"MOTOR_CONFIG","Step Delay",OPTIONS_TAB,IP_RW,0,IPS_OK);
 
@@ -206,13 +204,7 @@ bool IndiPiFaceFocuser1::initProperties()
 	dir = FOCUS_OUTWARD;
 	step_index = 0;
 
-	// load options
-	defineText(&PortTP);
-	defineSwitch(&MotorDirSP);
-	defineNumber(&MotorDelayNP);
-//	defineNumber(&FocusBacklashNP);
-
-    return true;
+        return true;
 }
 
 void IndiPiFaceFocuser1::ISGetProperties (const char *dev)
@@ -238,6 +230,9 @@ bool IndiPiFaceFocuser1::updateProperties()
 		defineSwitch(&FocusMotionSP);
 		defineSwitch(&FocusParkingSP);
 		defineSwitch(&FocusResetSP);
+                defineSwitch(&MotorDirSP);
+                defineNumber(&MotorDelayNP);
+                // defineNumber(&FocusBacklashNP);
     }
     else
     {
@@ -246,6 +241,8 @@ bool IndiPiFaceFocuser1::updateProperties()
 		deleteProperty(FocusMotionSP.name);
 		deleteProperty(FocusParkingSP.name);
 		deleteProperty(FocusResetSP.name);
+                deleteProperty(MotorDirSP.name);
+                deleteProperty(MotorDelayNP.name);
     }
 
     return true;
@@ -568,7 +565,8 @@ bool IndiPiFaceFocuser1::AbortFocuser()
 
 IndiPiFaceFocuser2::IndiPiFaceFocuser2()
 {
-	setVersion(1,0);
+	setVersion(MAJOR_VERSION,MINOR_VERSION);
+	setFocuserConnection(0);
 }
 
 IndiPiFaceFocuser2::~IndiPiFaceFocuser2()
@@ -633,9 +631,6 @@ bool IndiPiFaceFocuser2::initProperties()
     INDI::Focuser::initProperties();
 
 	// options tab
-	IUFillText(&PortT[0], "PORT", "Port","PiFace Relay+");
-	IUFillTextVector(&PortTP,PortT,1,getDeviceName(),"DEVICE_PORT","Ports",OPTIONS_TAB,IP_RO,0,IPS_OK);
-
 	IUFillNumber(&MotorDelayN[0],"MOTOR_DELAY","milliseconds","%0.0f",1,100,1,2);
 	IUFillNumberVector(&MotorDelayNP,MotorDelayN,1,getDeviceName(),"MOTOR_CONFIG","Step Delay",OPTIONS_TAB,IP_RW,0,IPS_OK);
 
@@ -681,13 +676,7 @@ bool IndiPiFaceFocuser2::initProperties()
 	dir = FOCUS_OUTWARD;
 	step_index = 0;
 
-	// load options
-	defineText(&PortTP);
-	defineSwitch(&MotorDirSP);
-	defineNumber(&MotorDelayNP);
-//	defineNumber(&FocusBacklashNP);
-
-    return true;
+        return true;
 }
 
 void IndiPiFaceFocuser2::ISGetProperties (const char *dev)
@@ -713,6 +702,9 @@ bool IndiPiFaceFocuser2::updateProperties()
 		defineSwitch(&FocusMotionSP);
 		defineSwitch(&FocusParkingSP);
 		defineSwitch(&FocusResetSP);
+                defineSwitch(&MotorDirSP);
+                defineNumber(&MotorDelayNP);
+                // defineNumber(&FocusBacklashNP);
     }
     else
     {
@@ -721,6 +713,8 @@ bool IndiPiFaceFocuser2::updateProperties()
 		deleteProperty(FocusMotionSP.name);
 		deleteProperty(FocusParkingSP.name);
 		deleteProperty(FocusResetSP.name);
+                deleteProperty(MotorDirSP.name);
+                deleteProperty(MotorDelayNP.name);
     }
 
     return true;

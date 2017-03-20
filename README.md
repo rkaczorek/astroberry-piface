@@ -8,8 +8,11 @@ The project provides INDI drivers using above addons:
 - PiFace Focuser (indi focuser providing absolute and relative position control),
 
 # Major changes
-- Starting from version 2.0.1 the driver supports up to 8 relays (requires 2 PiFace Relay Plus addon modules) and 2 stepper focusers.
-- From version 2.0.2 PiFace Control and Display driver (indi_piface_cad) was moved to [separate project](https://github.com/rkaczorek/astroberry-piface-cad).
+- Starting from version 2.0.2:
+  - libmcp23s17 is included as a submodule so you don't have to install it separately
+- Starting from version 2.0.1:
+  - driver supports up to 8 relays (requires 2 PiFace Relay Plus addon modules) and 2 stepper focusers
+  - PiFace Control and Display driver (indi_piface_cad) was moved to [separate project](https://github.com/rkaczorek/astroberry-piface-cad)
 
 # So what's the relation between Astroberry PiFace and Astroberry project?
 Astroberry PiFace is a successor of [Astroberry project](https://sourceforge.net/projects/astroberry/). Astroberry project was based on custom addon board, which required understanding of electronics and soldering skills to build. The new project was created to make things easier and let anybody use Raspberry Pi as a INDI server with support to all of these nice features of PiFace addon boards. Astroberry PiFace is based on hardware already available on market, so all you need is to put the tiles together, grab astroberry-piface software and you're ready to go.
@@ -37,11 +40,11 @@ make install
 ```
 Installing from binaries:
 ```
-wget https://github.com/rkaczorek/astroberry-piface/raw/master/binaries/astroberry-piface-latest.deb
-dpkg -i astroberry-piface-latest.deb
+wget https://github.com/rkaczorek/astroberry-piface/raw/master/binaries/astroberry-piface_2.0.2-1_armhf.deb
+dpkg -i astroberry-piface_2.0.2-1_armhf.deb
 ```
 
-#How to use it?
+# How to use it?
 Start your INDI server with Astroberry PiFace drivers:
 
 `indiserver -l /var/log/indi -f /var/run/indi -p 7624 indi_piface_relay indi_piface_focuser`
