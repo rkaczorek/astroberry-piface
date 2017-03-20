@@ -301,12 +301,6 @@ bool IndiPiFaceRelay::initProperties()
     IUFillSwitch(&Relay8S[0], "REL8BTN", "On/Off", ISS_OFF);
     IUFillSwitchVector(&Relay8SP, Relay8S, 1, getDeviceName(), "RELAY8", "Relay 8", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_IDLE);
 
-	// options
-    IUFillText(&PortT[0], "PORT", "Port","PiFace Relay+");
-    IUFillTextVector(&PortTP,PortT,1,getDeviceName(),"DEVICE_PORT","Ports",OPTIONS_TAB,IP_RO,0,IPS_OK);
-
-	defineText(&PortTP);
-
     return true;
 }
 bool IndiPiFaceRelay::updateProperties()

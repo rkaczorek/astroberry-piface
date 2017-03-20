@@ -24,7 +24,7 @@
 #include "piface_focuser.h"
 
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 1
+#define MINOR_VERSION 0
 
 #define FOCUSNAMEF1 "PiFace Focuser 1"
 #define FOCUSNAMEF2 "PiFace Focuser 2"
