@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <memory>
+#include <string.h>
 #include <mcp23s17.h>
 
 #include "piface_focuser.h"
@@ -94,7 +95,7 @@ void ISSnoopDevice (XMLEle *root)
 IndiPiFaceFocuser1::IndiPiFaceFocuser1()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
-        setFocuserConnection(0);
+        setFocuserConnection(CONNECTION_NONE);
 }
 
 IndiPiFaceFocuser1::~IndiPiFaceFocuser1()
@@ -566,7 +567,7 @@ bool IndiPiFaceFocuser1::AbortFocuser()
 IndiPiFaceFocuser2::IndiPiFaceFocuser2()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
-	setFocuserConnection(0);
+	setFocuserConnection(CONNECTION_NONE);
 }
 
 IndiPiFaceFocuser2::~IndiPiFaceFocuser2()

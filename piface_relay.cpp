@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <memory>
+#include <string.h>
 #include <mcp23s17.h>
 
 #include "piface_relay.h"
