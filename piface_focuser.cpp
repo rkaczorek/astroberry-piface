@@ -95,7 +95,7 @@ void ISSnoopDevice (XMLEle *root)
 IndiPiFaceFocuser1::IndiPiFaceFocuser1()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
-        setFocuserConnection(CONNECTION_NONE);
+	FI::SetCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
 }
 
 IndiPiFaceFocuser1::~IndiPiFaceFocuser1()
@@ -197,9 +197,6 @@ bool IndiPiFaceFocuser1::initProperties()
 	IUFillSwitch(&PresetGotoS[1], "Preset 2", "Preset 2", ISS_OFF);
 	IUFillSwitch(&PresetGotoS[2], "Preset 3", "Preset 3", ISS_OFF);
 	IUFillSwitchVector(&PresetGotoSP, PresetGotoS, 3, getDeviceName(), "Presets Goto", "Goto", MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
-
-	// set capabilities
-	SetFocuserCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
 
 	// set default values
 	dir = FOCUS_OUTWARD;
@@ -567,7 +564,7 @@ bool IndiPiFaceFocuser1::AbortFocuser()
 IndiPiFaceFocuser2::IndiPiFaceFocuser2()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
-	setFocuserConnection(CONNECTION_NONE);
+	FI::SetCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
 }
 
 IndiPiFaceFocuser2::~IndiPiFaceFocuser2()
@@ -669,9 +666,6 @@ bool IndiPiFaceFocuser2::initProperties()
 	IUFillSwitch(&PresetGotoS[1], "Preset 2", "Preset 2", ISS_OFF);
 	IUFillSwitch(&PresetGotoS[2], "Preset 3", "Preset 3", ISS_OFF);
 	IUFillSwitchVector(&PresetGotoSP, PresetGotoS, 3, getDeviceName(), "Presets Goto", "Goto", MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
-
-	// set capabilities
-	SetFocuserCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
 
 	// set default values
 	dir = FOCUS_OUTWARD;
