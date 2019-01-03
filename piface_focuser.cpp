@@ -96,6 +96,7 @@ IndiPiFaceFocuser1::IndiPiFaceFocuser1()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
 	FI::SetCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
+	Focuser::setSupportedConnections(CONNECTION_NONE);
 }
 
 IndiPiFaceFocuser1::~IndiPiFaceFocuser1()
@@ -565,6 +566,7 @@ IndiPiFaceFocuser2::IndiPiFaceFocuser2()
 {
 	setVersion(MAJOR_VERSION,MINOR_VERSION);
 	FI::SetCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
+	Focuser::setSupportedConnections(CONNECTION_NONE);
 }
 
 IndiPiFaceFocuser2::~IndiPiFaceFocuser2()
