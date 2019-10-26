@@ -21,7 +21,7 @@
 
 #include <indifocuser.h>
 
-class IndiPiFaceFocuser1 : public INDI::Focuser
+class IndiPiFaceFocuser : public INDI::Focuser
 {
     protected:
     private:
@@ -31,13 +31,13 @@ class IndiPiFaceFocuser1 : public INDI::Focuser
         ISwitchVectorProperty MotorDirSP;
         ISwitch FocusParkingS[2];
         ISwitchVectorProperty FocusParkingSP;
-	INumber FocusBacklashN[1];
-	INumberVectorProperty FocusBacklashNP;
-	INumber MotorDelayN[1];
-	INumberVectorProperty MotorDelayNP;
+		INumber FocusBacklashN[1];
+		INumberVectorProperty FocusBacklashNP;
+		INumber MotorDelayN[1];
+		INumberVectorProperty MotorDelayNP;
     public:
-        IndiPiFaceFocuser1();
-        virtual ~IndiPiFaceFocuser1();
+        IndiPiFaceFocuser();
+        virtual ~IndiPiFaceFocuser();
 
         const char *getDefaultName();
 
@@ -51,53 +51,14 @@ class IndiPiFaceFocuser1 : public INDI::Focuser
         virtual bool ISNewSwitch (const char *dev, const char *name, ISState *states, char *names[], int n);
         virtual bool saveConfigItems(FILE *fp);
 
-	virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
+		virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
         virtual IPState MoveAbsFocuser(int ticks);
         virtual IPState MoveRelFocuser(FocusDirection dir, int ticks);
-	virtual int StepperMotor(int steps, FocusDirection dir);
-	virtual bool AbortFocuser();
-	FocusDirection dir;
-	int mcp23s17_fd;
-	int step_index;
-};
-class IndiPiFaceFocuser2 : public INDI::Focuser
-{
-    protected:
-    private:
-        ISwitch FocusResetS[1];
-        ISwitchVectorProperty FocusResetSP;
-        ISwitch MotorDirS[2];
-        ISwitchVectorProperty MotorDirSP;
-        ISwitch FocusParkingS[2];
-        ISwitchVectorProperty FocusParkingSP;
-	INumber FocusBacklashN[1];
-	INumberVectorProperty FocusBacklashNP;
-	INumber MotorDelayN[1];
-	INumberVectorProperty MotorDelayNP;
-    public:
-        IndiPiFaceFocuser2();
-        virtual ~IndiPiFaceFocuser2();
-
-        const char *getDefaultName();
-
-        virtual bool Connect();
-        virtual bool Disconnect();
-        virtual bool initProperties();
-        virtual bool updateProperties();
-        virtual void ISGetProperties (const char *dev);
-
-        virtual bool ISNewNumber (const char *dev, const char *name, double values[], char *names[], int n);
-        virtual bool ISNewSwitch (const char *dev, const char *name, ISState *states, char *names[], int n);
-        virtual bool saveConfigItems(FILE *fp);
-
-	virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
-        virtual IPState MoveAbsFocuser(int ticks);
-        virtual IPState MoveRelFocuser(FocusDirection dir, int ticks);
-	virtual int StepperMotor(int steps, FocusDirection dir);
-	virtual bool AbortFocuser();
-	FocusDirection dir;
-	int mcp23s17_fd;
-	int step_index;
+		virtual int StepperMotor(int steps, FocusDirection dir);
+		virtual bool AbortFocuser();
+		FocusDirection dir;
+		int mcp23s17_fd;
+		int step_index;
 };
 
 #endif

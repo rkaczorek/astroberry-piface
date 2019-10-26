@@ -1,0 +1,27 @@
+Source: indi-astroberry-piface
+Section: science
+Priority: extra
+Maintainer: Radek Kaczorek <rkaczorek@gmail.com>
+Build-Depends: debhelper (>= 9), cdbs, cmake (>= 2.4.7), libindi-dev
+Standards-Version: 3.9.1
+
+Package: indi-astroberry-piface
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libindi1
+Description: INDI Driver for PiFace addon boards to Raspberry Pi
+ PiFace Focuser - provides stepper motor driver with absolute and relative position control (Motor Extra addon required)
+ PiFace Relay - provides support for 4 relays 20V/1A with status LEDs
+ .
+ This driver is compatible with any INDI client such as KStars or Xephem.
+
+Package: indi-astroberry-piface-dbg
+Priority: extra
+Section: debug
+Architecture: any
+Depends: indi-astroberry-piface (= ${binary:Version}), ${misc:Depends}
+Description: INDI Driver for PiFace addon boards to Raspberry Pi
+ PiFace Focuser - provides stepper motor driver with absolute and relative position control (Motor Extra addon required)
+ PiFace Relay - provides support for 4 relays 20V/1A with status LEDs                                                  
+ .
+ This driver is compatible with any INDI client such as KStars or Xephem.
+

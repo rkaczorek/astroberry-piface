@@ -3,7 +3,7 @@
 <devGroup group="Focusers">
         <device label="PiFace Focuser">
                 <driver name="PiFace Focuser">indi_piface_focuser</driver>
-                <version>2.0.2</version>
+                <version>@VERSION_MAJOR@.@VERSION_MINOR@</version>
         </device>
 </devGroup>
 </driversList>

@@ -21,12 +21,11 @@
 #include <unistd.h>
 #include <memory>
 #include <string.h>
+#include "config.h"
+
 #include <mcp23s17.h>
 
 #include "piface_relay.h"
-
-#define MAJOR_VERSION 2
-#define MINOR_VERSION 0
 
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 
@@ -83,7 +82,7 @@ void ISSnoopDevice (XMLEle *root)
 }
 IndiPiFaceRelay::IndiPiFaceRelay()
 {
-	setVersion(MAJOR_VERSION,MINOR_VERSION);
+	setVersion(VERSION_MAJOR,VERSION_MINOR);
 }
 IndiPiFaceRelay::~IndiPiFaceRelay()
 {
