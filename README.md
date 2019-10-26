@@ -8,8 +8,9 @@ The project provides INDI drivers using above addons:
 - PiFace Focuser (indi focuser providing absolute and relative position control),
 
 # Major changes
-- Starting from cersion 2.1:
+- Starting from version 2.1:
   - libmcp23s17 is linked statically
+  - multiple steppers and relays are not supported
 - Starting from version 2.0.2:
   - libmcp23s17 is included as a submodule so you don't have to install it separately
 - Starting from version 2.0.1:
