@@ -8,6 +8,8 @@ The project provides INDI drivers using above addons:
 - PiFace Focuser (indi focuser providing absolute and relative position control),
 
 # Major changes
+- Starting from cersion 2.1:
+  - libmcp23s17 is linked statically
 - Starting from version 2.0.2:
   - libmcp23s17 is included as a submodule so you don't have to install it separately
 - Starting from version 2.0.1:
@@ -37,11 +39,6 @@ cd build
 cmake ..
 make
 make install
-```
-Installing from binaries:
-```
-wget https://github.com/rkaczorek/astroberry-piface/raw/master/binaries/astroberry-piface_2.0.2-1_armhf.deb
-dpkg -i astroberry-piface_2.0.2-1_armhf.deb
 ```
 
 # How to use it?
