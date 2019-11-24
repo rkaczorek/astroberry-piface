@@ -26,7 +26,7 @@
 
 #include "piface_focuser.h"
 
-#define FOCUSNAMEF "PiFace Focuser"
+#define FOCUSERNAME "PiFace Focuser"
 
 #define CHECK_BIT(var,pos) (((var)>>(pos)) & 1)
 #define MAX_STEPS 20000
@@ -89,7 +89,7 @@ IndiPiFaceFocuser::~IndiPiFaceFocuser()
 
 const char * IndiPiFaceFocuser::getDefaultName()
 {
-	return FOCUSNAMEF;
+	return FOCUSERNAME;
 }
 
 bool IndiPiFaceFocuser::Connect()
@@ -116,17 +116,17 @@ bool IndiPiFaceFocuser::Connect()
 	// I/O direction depending on port selected
 	if ( GPIOSelectS[0].s == ISS_ON )
 	{
-		mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
-	} else {
 		mcp23s17_write_reg(0x00, IODIRA, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
 	}
 
 	// pull ups depending on port selected 
 	if ( GPIOSelectS[0].s == ISS_ON )
 	{
-		mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
-	} else {
 		mcp23s17_write_reg(0x00, GPPUA, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
 	}
 
 	IDMessage(getDeviceName(), "PiFace Focuser connected successfully.");
@@ -510,6 +510,7 @@ IPState IndiPiFaceFocuser::MoveAbsFocuser(int targetTicks)
 
 int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
 {
+	// Based on: https://github.com/piface/pifacerelayplus/blob/master/pifacerelayplus/core.py
     int step_states[8];
     int value;
     int payload = 0x00;
@@ -543,8 +544,8 @@ int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
 
     for (int i = 0; i < steps; i++)
     {
-	// update position for a client
 
+		// update position for a client
         if ( dir == FOCUS_INWARD )
         	FocusAbsPosN[0].value -= 1;
         if ( dir == FOCUS_OUTWARD )
@@ -553,38 +554,40 @@ int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
 
 		if(step_index == (sizeof(step_states)/sizeof(int)))
 			step_index = 0;
+
 		value = step_states[step_index];
 		step_index++;
 
-		// GPIOB lower nibble or upper nibble depending on port selected
+		// GPIOB lower nibble or upper nibble (order reversed) depending on port selected
 		if ( GPIOSelectS[0].s == ISS_ON )
 		{
-			payload = payload & 0xf0;
-			payload = payload | ((value & 0xf) ^ 0xf);
-		} else {
 			payload = payload & 0x0f;
 			payload = payload | ((value & 0xf) << 4);
+		} else {
+			payload = payload & 0xf0;
+			payload = payload | ((value & 0xf) ^ 0xf);
 		}
 
 		// make step depending on port selected
 		if ( GPIOSelectS[0].s == ISS_ON )
 		{
-			mcp23s17_write_reg(payload, GPIOB, 0, mcp23s17_fd);
-		} else {
 			mcp23s17_write_reg(payload, GPIOA, 0, mcp23s17_fd);
-		}
-		usleep(MotorDelayN[0].value * 1000);
-		}
-
-		// Coast motor depending on port selected
-		if ( GPIOSelectS[0].s == ISS_ON )
-		{
-			mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
 		} else {
-			mcp23s17_write_reg(0x00, GPIOA, 0, mcp23s17_fd);
+			mcp23s17_write_reg(payload, GPIOB, 0, mcp23s17_fd);
 		}
 
-		return 0;
+		usleep(MotorDelayN[0].value * 1000);
+	}
+
+	// Coast motor depending on port selected
+	if ( GPIOSelectS[0].s == ISS_ON )
+	{
+		mcp23s17_write_reg(0x00, GPIOA, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
+	}
+
+	return 0;
 }
 bool IndiPiFaceFocuser::AbortFocuser()
 {
@@ -593,17 +596,17 @@ bool IndiPiFaceFocuser::AbortFocuser()
 	// Brake depending on port selected
 	if ( GPIOSelectS[0].s == ISS_ON )
 	{
-		mcp23s17_write_reg(0xff, GPIOB, 0, mcp23s17_fd);
+		mcp23s17_write_reg(0xf0, GPIOA, 0, mcp23s17_fd);
 	} else {
-		mcp23s17_write_reg(0xff, GPIOA, 0, mcp23s17_fd);
+		mcp23s17_write_reg(0xf0, GPIOB, 0, mcp23s17_fd);
 	}
 
 	// Coast motor depending on port selected
 	if ( GPIOSelectS[0].s == ISS_ON )
 	{
-		mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
-	} else {
 		mcp23s17_write_reg(0x00, GPIOA, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
 	}
 
 	return true;
