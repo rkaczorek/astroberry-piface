@@ -113,11 +113,21 @@ bool IndiPiFaceFocuser::Connect()
                              INTPOL_LOW;
 	mcp23s17_write_reg(ioconfig, IOCON, 0, mcp23s17_fd);
 
-	// I/O direction
-	mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
+	// I/O direction depending on port selected
+	if ( GPIOSelectS[0].s == ISS_ON )
+	{
+		mcp23s17_write_reg(0x00, IODIRB, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, IODIRA, 0, mcp23s17_fd);
+	}
 
-	// pull ups
-	mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
+	// pull ups depending on port selected 
+	if ( GPIOSelectS[0].s == ISS_ON )
+	{
+		mcp23s17_write_reg(0x00, GPPUB, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, GPPUA, 0, mcp23s17_fd);
+	}
 
 	IDMessage(getDeviceName(), "PiFace Focuser connected successfully.");
 	return true;
@@ -152,7 +162,7 @@ bool IndiPiFaceFocuser::initProperties()
 	IUFillSwitchVector(&MotorDirSP,MotorDirS,2,getDeviceName(),"MOTOR_DIR","Motor Dir",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
 
 	IUFillNumber(&FocusBacklashN[0], "FOCUS_BACKLASH_VALUE", "Steps", "%0.0f", 0, 100, 1, 0);
-	IUFillNumberVector(&FocusBacklashNP, FocusBacklashN, 1, getDeviceName(), "FOCUS_BACKLASH", "Backlash", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
+	IUFillNumberVector(&FocusBacklashNP, FocusBacklashN, 1, getDeviceName(), "FOCUS_BACKLASH", "Backlash", OPTIONS_TAB, IP_RW, 0, IPS_OK);
 
 	IUFillSwitch(&FocusParkingS[0],"FOCUS_PARKON","Enable",ISS_ON);
 	IUFillSwitch(&FocusParkingS[1],"FOCUS_PARKOFF","Disable",ISS_OFF);
@@ -162,9 +172,13 @@ bool IndiPiFaceFocuser::initProperties()
 	IUFillSwitchVector(&FocusResetSP,FocusResetS,1,getDeviceName(),"FOCUS_RESET","Position Reset",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
 
 	// main tab
+	IUFillSwitch(&GPIOSelectS[0],"GPIOA","Port A",ISS_ON);
+	IUFillSwitch(&GPIOSelectS[1],"GPIOB","Port B",ISS_OFF);
+	IUFillSwitchVector(&GPIOSelectSP,GPIOSelectS,2,getDeviceName(),"GPIO_SELECT","Motor Port",MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
+	
 	IUFillSwitch(&FocusMotionS[0],"FOCUS_INWARD","Focus In",ISS_OFF);
 	IUFillSwitch(&FocusMotionS[1],"FOCUS_OUTWARD","Focus Out",ISS_ON);
-	IUFillSwitchVector(&FocusMotionSP,FocusMotionS,2,getDeviceName(),"FOCUS_MOTION","Direction",MAIN_CONTROL_TAB,IP_RW,ISR_ATMOST1,60,IPS_OK);
+	IUFillSwitchVector(&FocusMotionSP,FocusMotionS,2,getDeviceName(),"FOCUS_MOTION","Direction",MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
 
 	IUFillNumber(&FocusRelPosN[0],"FOCUS_RELATIVE_POSITION","Steps","%0.0f",0,(int)MAX_STEPS/10,(int)MAX_STEPS/100,(int)MAX_STEPS/100);
 	IUFillNumberVector(&FocusRelPosNP,FocusRelPosN,1,getDeviceName(),"REL_FOCUS_POSITION","Relative",MAIN_CONTROL_TAB,IP_RW,60,IPS_OK);
@@ -175,7 +189,7 @@ bool IndiPiFaceFocuser::initProperties()
 	IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
 	IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
 	IUFillNumber(&PresetN[2], "Preset 3", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
-	IUFillNumberVector(&PresetNP, PresetN, 3, getDeviceName(), "Presets", "Presets", "Presets", IP_RW, 0, IPS_IDLE);
+	IUFillNumberVector(&PresetNP, PresetN, 3, getDeviceName(), "Presets", "Presets", "Presets", IP_RW, 0, IPS_OK);
 
 	IUFillSwitch(&PresetGotoS[0], "Preset 1", "Preset 1", ISS_OFF);
 	IUFillSwitch(&PresetGotoS[1], "Preset 2", "Preset 2", ISS_OFF);
@@ -186,7 +200,10 @@ bool IndiPiFaceFocuser::initProperties()
 	dir = FOCUS_OUTWARD;
 	step_index = 0;
 
-        return true;
+	// Must be available before connect
+    defineSwitch(&GPIOSelectSP);
+
+	return true;
 }
 
 void IndiPiFaceFocuser::ISGetProperties (const char *dev)
@@ -204,7 +221,7 @@ bool IndiPiFaceFocuser::updateProperties()
 {
 
     INDI::Focuser::updateProperties();
-
+    
     if (isConnected())
     {
 		defineNumber(&FocusAbsPosNP);
@@ -212,9 +229,9 @@ bool IndiPiFaceFocuser::updateProperties()
 		defineSwitch(&FocusMotionSP);
 		defineSwitch(&FocusParkingSP);
 		defineSwitch(&FocusResetSP);
-                defineSwitch(&MotorDirSP);
-                defineNumber(&MotorDelayNP);
-                // defineNumber(&FocusBacklashNP);
+		defineSwitch(&MotorDirSP);
+		defineNumber(&MotorDelayNP);
+		// defineNumber(&FocusBacklashNP);
     }
     else
     {
@@ -223,8 +240,8 @@ bool IndiPiFaceFocuser::updateProperties()
 		deleteProperty(FocusMotionSP.name);
 		deleteProperty(FocusParkingSP.name);
 		deleteProperty(FocusResetSP.name);
-                deleteProperty(MotorDirSP.name);
-                deleteProperty(MotorDelayNP.name);
+		deleteProperty(MotorDirSP.name);
+		deleteProperty(MotorDelayNP.name);
     }
 
     return true;
@@ -359,6 +376,32 @@ bool IndiPiFaceFocuser::ISNewSwitch (const char *dev, const char *name, ISState 
 			return true;
 		}
 
+        // handle port selection
+        if(!strcmp(name, GPIOSelectSP.name))
+        {
+			if (isConnected())
+			{
+				DEBUG(INDI::Logger::DBG_SESSION, "Cannot change port while device is connected");
+				IDSetSwitch(&GPIOSelectSP, "Cannot change port while device is connected");
+				return false;
+			} else {
+				IUUpdateSwitch(&GPIOSelectSP, states, names, n);
+				if ( GPIOSelectS[0].s == ISS_ON )
+				{
+					DEBUG(INDI::Logger::DBG_SESSION, "PiFace Focuser port set to A");
+				}
+
+				if ( GPIOSelectS[1].s == ISS_ON )
+				{
+					DEBUG(INDI::Logger::DBG_SESSION, "PiFace Focuser port set to B");
+				}
+
+				GPIOSelectSP.s = IPS_OK;
+				IDSetSwitch(&GPIOSelectSP, NULL);
+				return true;
+			}
+		}
+
         // handle focus abort - TODO
 /*
         if (!strcmp(name, AbortSP.name))
@@ -390,6 +433,7 @@ bool IndiPiFaceFocuser::saveConfigItems(FILE *fp)
 	IUSaveConfigNumber(fp, &FocusBacklashNP);
 	IUSaveConfigSwitch(fp, &FocusParkingSP);
 	IUSaveConfigSwitch(fp, &MotorDirSP);
+	IUSaveConfigSwitch(fp, &GPIOSelectSP);
 
 	if ( FocusParkingS[0].s == ISS_ON )
 		IUSaveConfigNumber(fp, &FocusAbsPosNP);
@@ -512,17 +556,33 @@ int IndiPiFaceFocuser::StepperMotor(int steps, FocusDirection direction)
 		value = step_states[step_index];
 		step_index++;
 
-		// GPIOB lower nibble, polarity reversed
-		payload = payload & 0xf0;
-		payload = payload | ((value & 0xf) ^ 0xf);
+		// GPIOB lower nibble or upper nibble depending on port selected
+		if ( GPIOSelectS[0].s == ISS_ON )
+		{
+			payload = payload & 0xf0;
+			payload = payload | ((value & 0xf) ^ 0xf);
+		} else {
+			payload = payload & 0x0f;
+			payload = payload | ((value & 0xf) << 4);
+		}
 
-		// make step
-		mcp23s17_write_reg(payload, GPIOB, 0, mcp23s17_fd);
+		// make step depending on port selected
+		if ( GPIOSelectS[0].s == ISS_ON )
+		{
+			mcp23s17_write_reg(payload, GPIOB, 0, mcp23s17_fd);
+		} else {
+			mcp23s17_write_reg(payload, GPIOA, 0, mcp23s17_fd);
+		}
 		usleep(MotorDelayN[0].value * 1000);
 		}
 
-		// Coast motors
-		mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
+		// Coast motor depending on port selected
+		if ( GPIOSelectS[0].s == ISS_ON )
+		{
+			mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
+		} else {
+			mcp23s17_write_reg(0x00, GPIOA, 0, mcp23s17_fd);
+		}
 
 		return 0;
 }
@@ -530,11 +590,21 @@ bool IndiPiFaceFocuser::AbortFocuser()
 {
 	IDMessage(getDeviceName() , "PiFace Focuser aborted");
 
-	// Brake
-	mcp23s17_write_reg(0xff, GPIOB, 0, mcp23s17_fd);
+	// Brake depending on port selected
+	if ( GPIOSelectS[0].s == ISS_ON )
+	{
+		mcp23s17_write_reg(0xff, GPIOB, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0xff, GPIOA, 0, mcp23s17_fd);
+	}
 
-	// Cost
-	mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
+	// Coast motor depending on port selected
+	if ( GPIOSelectS[0].s == ISS_ON )
+	{
+		mcp23s17_write_reg(0x00, GPIOB, 0, mcp23s17_fd);
+	} else {
+		mcp23s17_write_reg(0x00, GPIOA, 0, mcp23s17_fd);
+	}
 
 	return true;
 }

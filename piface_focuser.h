@@ -27,6 +27,8 @@ class IndiPiFaceFocuser : public INDI::Focuser
     private:
         ISwitch FocusResetS[1];
         ISwitchVectorProperty FocusResetSP;
+        ISwitch GPIOSelectS[2];
+        ISwitchVectorProperty GPIOSelectSP;
         ISwitch MotorDirS[2];
         ISwitchVectorProperty MotorDirSP;
         ISwitch FocusParkingS[2];
