@@ -2,7 +2,7 @@ indi-astroberry-piface (2.2) buster; urgency=medium
 
   * Support for 2 piface motor ports added
 
- -- Radek Kaczorek <rkaczorek@gmail.com>  Sun, 24 Nov 2019 14:00:31 +0100
+ -- Radek Kaczorek <rkaczorek@gmail.com>  Mon, 25 Nov 2019 01:16:44 +0100
 
 indi-astroberry-piface (2.1) buster; urgency=medium
 
