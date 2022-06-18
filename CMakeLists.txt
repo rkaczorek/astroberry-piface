@@ -6,7 +6,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules/")
 include(GNUInstallDirs)
 
 set (VERSION_MAJOR 2)
-set (VERSION_MINOR 2)
+set (VERSION_MINOR 3)
 
 find_package(INDI REQUIRED)
 
@@ -22,7 +22,14 @@ include_directories(${CMAKE_SOURCE_DIR}/libs/)
 include(CMakeCommon)
 
 add_library(mcp23s17 STATIC IMPORTED)
-set_property(TARGET mcp23s17 PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/libmcp23s17.a)
+
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv+")
+set_property(TARGET mcp23s17 PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armhf/libmcp23s17.a)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+set_property(TARGET mcp23s17 PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/arm64/libmcp23s17.a)
+else ()
+set_property(TARGET mcp23s17 PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/armhf/libmcp23s17.a)
+endif ()
 
 set(PIFACE_LIBRARIES "mcp23s17")
 
